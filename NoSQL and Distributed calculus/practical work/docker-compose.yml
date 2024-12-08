@@ -1,0 +1,56 @@
+services:
+  namenode:
+    image: gelog/hadoop
+    ports:
+      - "9870:9870"  # Changed from 50070
+    command: hdfs namenode
+    hostname: hdfs-namenode
+    networks: 
+      - hadoop
+    environment:
+      - HADOOP_NAMENODE_PORT=9870
+
+  datanode:
+    image: gelog/hadoop
+    command: hdfs datanode
+    ports:
+      - "9864:9864"  # Changed from 50075
+    networks: 
+      - hadoop
+    depends_on:
+      - namenode
+    environment:
+      - HADOOP_DATANODE_PORT=9864
+
+  secondarynamenode:
+    image: gelog/hadoop
+    command: hdfs secondarynamenode
+    ports:
+      - "9868:9868"  # Changed from 50090
+    networks: 
+      - hadoop
+    depends_on:
+      - namenode
+    environment:
+      - HADOOP_SECONDARY_PORT=9868
+
+  yarn:
+    image: gelog/hadoop
+    ports:
+      - "8088:8088"  # Resource manager
+      - "8042:8042"  # Node manager
+    command: start-yarn.sh
+    hostname: yarn
+    networks: 
+      - hadoop
+    depends_on:
+      - namenode
+    volumes:
+      - hadoop_data:/data
+
+volumes:
+  hadoop_data:
+
+networks:
+  hadoop:
+    driver: bridge

@@ -1,0 +1,11 @@
+FROM node:15 as server
+WORKDIR /app
+ENV NODE_ENV=production
+RUN wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian92-x86_64-100.3.1.deb && \
+    apt install ./mongodb-database-tools-*.deb && \
+    rm -f mongodb-database-tools-*.deb
+COPY server/package.json ./
+RUN npm install
+COPY ./ ./
+EXPOSE 5000
+CMD ["node", "src/app.js"]
